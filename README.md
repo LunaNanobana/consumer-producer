@@ -4,9 +4,13 @@
 A full-stack marketplace platform with a shared backend powering both a web application and a Flutter mobile client.
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/b01f8382-fd34-4986-bfb3-c78810caa09d" width="70%">
-  <---->
-  <img src="https://github.com/user-attachments/assets/1edae9d1-4d24-4f0e-99bf-c6f9d478aefa" width="30%">
+  <img src="https://github.com/user-attachments/assets/b01f8382-fd34-4986-bfb3-c78810caa09d" width="60%">
+  ^
+  |
+  |
+  |
+  ˅
+  <img src="https://github.com/user-attachments/assets/1edae9d1-4d24-4f0e-99bf-c6f9d478aefa" width="40%">
 </p>
 
 ---
