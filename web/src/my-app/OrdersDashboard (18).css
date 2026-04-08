@@ -1,0 +1,135 @@
+import React, { useState } from "react";
+import "./PageLayout.css";
+import MyManagerPage from "./MyManagerPage";
+import Chats from "./Chats";
+import Catalog from "./Catalog";
+import MyOwnerPage from "./MyOwnerPage";
+
+const initialProducts = [
+  { id: 1, name: "Apples", qty: "120 kg", due: "2025-11-28T05:00:00Z", image: "https://www.aussieapples.com.au/wp-content/uploads/2017/06/pink-lady-300x300.png" },
+  { id: 2, name: "Olive Oil", qty: "50 l", due: "2025-12-07T05:00:00Z", image: "https://earth-ona.com/wp-content/uploads/2024/01/Olive-oil-300x300.jpg" },
+  { id: 3, name: "Tomatoes", qty: "80.5 kg", due: "2025-11-25T05:00:00Z", image: "https://www.sunsetgrown.com/wp-content/uploads/2020/10/carousel-beefsteak-tomato-300x300.png" },
+  { id: 4, name: "Milk", qty: "200 l", due: "2025-11-24T05:00:00Z", image: "https://marisamoore.com/wp-content/uploads/2021/06/Homemade-Hemp-Milk-recipe-300x300.jpg" }
+];
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) + "  " + d.toLocaleDateString();
+}
+
+function ProductCard({ p, onClick }) {
+  return (
+    <button
+      className="product-card-vertical"
+      onClick={() => onClick(p)}
+      title={`Open ${p.name}`}
+      type="button"
+    >
+      <div className="product-thumb-vertical" aria-hidden>
+        <img src={p.image} alt={p.name} />
+      </div>
+
+      <div className="product-info-vertical">
+        <div className="product-title">{p.name}</div>
+        <div className="product-qty">{p.qty}</div>
+        <div className="product-due">⏱ Due: {formatDate(p.due)}</div>
+      </div>
+    </button>
+  );
+}
+
+export default function PageLayout() {
+  const [page, setPage] = useState("dashboard");
+  const [products] = useState(initialProducts);
+  const [selected, setSelected] = useState(null);
+
+  function onCardClick(p) {
+    setSelected(p);
+  }
+
+  return (
+    <div className="app-shell">
+      <header className="appbar">
+        <div className="appbar-title">
+          {page === "profile" ? "My Account" : page === "chats" ? "Chats" : page === "catalog" ? "Catalog" : "Dashboard"}
+        </div>
+      </header>
+
+      <div className="app-body">
+        <aside className="sidebar">
+          <div className="sidebar-block">
+            <button
+              className={`side-btn ${page === "dashboard" ? "active" : ""}`}
+              onClick={() => setPage("dashboard")}
+              type="button"
+            >
+              <span className="icon">📋</span>
+              <span className="label">Dashboard</span>
+            </button>
+
+            <button
+              className={`side-btn ${page === "chats" ? "active" : ""}`}
+              onClick={() => setPage("chats")}
+              type="button"
+            >
+              <span className="icon">💬</span>
+              <span className="label">Chats</span>
+            </button>
+
+            <button
+              className={`side-btn ${page === "catalog" ? "active" : ""}`}
+              onClick={() => setPage("catalog")}
+              type="button"
+            >
+              <span className="icon">🛒</span>
+              <span className="label">Catalog</span>
+            </button>
+
+            <button
+              className={`side-btn ${page === "profile" ? "active" : ""}`}
+              onClick={() => setPage("profile")}
+              type="button"
+            >
+              <span className="icon">👤</span>
+              <span className="label">My Page</span>
+            </button>
+          </div>
+        </aside>
+
+        <main className="main-area">
+          {page === "dashboard" && (
+            <>
+              <div className="products-header">
+                <h2>Products</h2>
+                <div className="products-total">Total: {products.length}</div>
+              </div>
+
+              <section className="product-list-vertical" aria-label="product list">
+                {products.map(p => (
+                  <ProductCard key={p.id} p={p} onClick={onCardClick} />
+                ))}
+              </section>
+
+              {selected && <div className="selected-note">Selected: {selected.name}</div>}
+            </>
+          )}
+
+          {page === "catalog" && <Catalog />}
+
+
+          {page === "chats" && <Chats />}
+
+          {page === "profile" && (
+            <MyManagerPage
+              name="Bruce Wayne"
+              id="12345"
+              onManage={() => {
+                setPage("dashboard");
+              }}
+            />
+          )}
+        </main>
+      </div>
+    </div>
+  );
+}

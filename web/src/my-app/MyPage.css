@@ -1,0 +1,184 @@
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../AuthContext";
+import * as api from "../api";
+import "./PageLayout.css";
+
+export default function Complaints() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [complaints, setComplaints] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    async function fetchComplaints() {
+      try {
+        setLoading(true);
+        const complaintsData = await api.getComplaints();
+        if (complaintsData.length === 0) {
+          setComplaints([{
+            id: 'example',
+            description: 'This is where complaints from users will be displayed. You can view, forward, and resolve complaints here.',
+            status: 'open',
+            order: { id: 'N/A' },
+            created_at: new Date().toISOString(),
+            raised_by_consumer: true
+          }]);
+        } else {
+          setComplaints(complaintsData);
+        }
+        setError('');
+      } catch (err) {
+        console.error('Error fetching complaints:', err);
+        setError('Failed to load complaints');
+        setComplaints([{
+          id: 'example',
+          description: 'This is where complaints from users will be displayed. You can view, forward, and resolve complaints here.',
+          status: 'open',
+          order: { id: 'N/A' },
+          created_at: new Date().toISOString(),
+          raised_by_consumer: true
+        }]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchComplaints();
+  }, []);
+
+  const handleForward = async (complaintId) => {
+    if (complaintId === 'example') {
+      alert('This is an example complaint. Real complaints can be forwarded to managers/owners.');
+      return;
+    }
+    try {
+      await api.forwardComplaint(complaintId);
+      const updated = await api.getComplaints();
+      setComplaints(updated);
+    } catch (err) {
+      console.error('Error forwarding complaint:', err);
+      setError('Failed to forward complaint');
+    }
+  };
+
+  const handleResolve = async (complaintId) => {
+    if (complaintId === 'example') {
+      alert('This is an example complaint. Real complaints can be resolved by any logged-in user.');
+      return;
+    }
+    try {
+      await api.resolveComplaint(complaintId);
+      const updated = await api.getComplaints();
+      setComplaints(updated);
+    } catch (err) {
+      console.error('Error resolving complaint:', err);
+      setError('Failed to resolve complaint');
+    }
+  };
+
+  function formatDate(iso) {
+    const d = new Date(iso);
+    return d.toLocaleString([], { hour: "2-digit", minute: "2-digit" }) + "  " + d.toLocaleDateString();
+  }
+
+  return (
+    <div style={{ padding: '20px' }}>
+      <div style={{ padding: '10px', borderBottom: '1px solid #ddd', marginBottom: '20px' }}>
+        <button
+          onClick={() => navigate('/dashboard')}
+          style={{
+            padding: '8px 16px',
+            backgroundColor: '#007bff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '14px'
+          }}
+        >
+          ← Back to Dashboard
+        </button>
+      </div>
+
+      <h2>Complaints</h2>
+
+      {error && (
+        <div style={{ padding: '10px', backgroundColor: '#f8d7da', color: '#721c24', borderRadius: '4px', marginBottom: '20px' }}>
+          {error}
+        </div>
+      )}
+
+      {loading ? (
+        <div style={{ padding: '20px', textAlign: 'center' }}>Loading complaints...</div>
+      ) : (
+        <div style={{ overflowX: 'auto', marginTop: '20px' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'white' }}>
+            <thead>
+              <tr style={{ backgroundColor: '#f8f9fa' }}>
+                <th style={{ padding: '12px', textAlign: 'left', border: '1px solid #dee2e6' }}>ID</th>
+                <th style={{ padding: '12px', textAlign: 'left', border: '1px solid #dee2e6' }}>Order ID</th>
+                <th style={{ padding: '12px', textAlign: 'left', border: '1px solid #dee2e6' }}>Description</th>
+                <th style={{ padding: '12px', textAlign: 'left', border: '1px solid #dee2e6' }}>Status</th>
+                <th style={{ padding: '12px', textAlign: 'left', border: '1px solid #dee2e6' }}>Date</th>
+                <th style={{ padding: '12px', textAlign: 'left', border: '1px solid #dee2e6' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {complaints.length === 0 ? (
+                <tr>
+                  <td colSpan="6" style={{ padding: '20px', textAlign: 'center' }}>No complaints found.</td>
+                </tr>
+              ) : (
+                complaints.map((complaint) => (
+                  <tr key={complaint.id}>
+                    <td style={{ padding: '12px', border: '1px solid #dee2e6' }}>#{complaint.id}</td>
+                    <td style={{ padding: '12px', border: '1px solid #dee2e6' }}>Order #{complaint.order?.id || 'N/A'}</td>
+                    <td style={{ padding: '12px', border: '1px solid #dee2e6', maxWidth: '300px' }}>
+                      <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {complaint.description}
+                      </div>
+                    </td>
+                    <td style={{ padding: '12px', border: '1px solid #dee2e6' }}>
+                      <span style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px',
+                        backgroundColor: complaint.status === 'resolved' ? '#28a745' : 
+                                       complaint.status === 'in_progress' ? '#17a2b8' : '#dc3545',
+                        color: 'white'
+                      }}>
+                        {complaint.status}
+                      </span>
+                    </td>
+                    <td style={{ padding: '12px', border: '1px solid #dee2e6' }}>
+                      {formatDate(complaint.created_at)}
+                    </td>
+                    <td style={{ padding: '12px', border: '1px solid #dee2e6' }}>
+                      {complaint.status !== 'resolved' && (
+                        <>
+                          <button
+                            onClick={() => handleForward(complaint.id)}
+                            style={{ padding: '4px 8px', marginRight: '5px', backgroundColor: '#17a2b8', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}
+                          >
+                            Forward
+                          </button>
+                          <button
+                            onClick={() => handleResolve(complaint.id)}
+                            style={{ padding: '4px 8px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}
+                          >
+                            Resolve
+                          </button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+

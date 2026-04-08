@@ -1,0 +1,160 @@
+import React, { useState, useContext } from 'react';
+import { AuthContext } from '../AuthContext';
+import { useNavigate, Link } from 'react-router-dom';
+
+export const Register = () => {
+    const navigate = useNavigate();
+    const { register } = useContext(AuthContext);
+    const [formData, setFormData] = useState({
+        username: '',
+        email: '',
+        password: '',
+        passwordConfirm: '',
+        role: 'supplier',
+        firstName: '',
+        lastName: '',
+        companyName: ''
+    });
+    const [error, setError] = useState('');
+
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        if (formData.password !== formData.passwordConfirm) {
+            setError('Passwords do not match');
+            return;
+        }
+
+        if (formData.password.length < 8) {
+            setError('Password must be at least 8 characters long');
+            return;
+        }
+
+        try {
+            const success = await register(
+                formData.username,
+                formData.email,
+                formData.password,
+                formData.passwordConfirm,
+                formData.role,
+                formData.firstName,
+                formData.lastName,
+                formData.companyName
+            );
+
+            if (success) {
+                navigate('/dashboard');
+            } else {
+                setError('Registration failed. Please check your information and try again.');
+            }
+        } catch (err) {
+            const errorMessage = err.message || 'Registration failed. Please try again.';
+            if (errorMessage.includes('Cannot connect to server')) {
+                setError('Cannot connect to backend server. Please make sure Docker containers are running. Run: docker-compose up');
+            } else {
+                setError(errorMessage);
+            }
+        }
+    };
+
+    return (
+        <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px' }}>
+            <h2>Register</h2>
+            {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
+            <form onSubmit={handleSubmit}>
+                <div style={{ marginBottom: '10px' }}>
+                    <input
+                        type="text"
+                        name="username"
+                        placeholder="Username"
+                        value={formData.username}
+                        onChange={handleChange}
+                        required
+                        style={{ width: '100%', padding: '8px' }}
+                    />
+                </div>
+                <div style={{ marginBottom: '10px' }}>
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="Email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
+                        style={{ width: '100%', padding: '8px' }}
+                    />
+                </div>
+                <div style={{ marginBottom: '10px' }}>
+                    <input
+                        type="text"
+                        name="firstName"
+                        placeholder="First Name"
+                        value={formData.firstName}
+                        onChange={handleChange}
+                        style={{ width: '100%', padding: '8px' }}
+                    />
+                </div>
+                <div style={{ marginBottom: '10px' }}>
+                    <input
+                        type="text"
+                        name="lastName"
+                        placeholder="Last Name"
+                        value={formData.lastName}
+                        onChange={handleChange}
+                        style={{ width: '100%', padding: '8px' }}
+                    />
+                </div>
+                <div style={{ marginBottom: '10px' }}>
+                    <input
+                        type="text"
+                        name="companyName"
+                        placeholder="Company Name *"
+                        value={formData.companyName}
+                        onChange={handleChange}
+                        required
+                        style={{ width: '100%', padding: '8px' }}
+                    />
+                </div>
+                <div style={{ marginBottom: '10px', padding: '10px', backgroundColor: '#e7f3ff', borderRadius: '4px' }}>
+                    <p style={{ margin: 0, fontSize: '14px' }}>Registering as <strong>Supplier Owner</strong>. You will be able to add managers and salespeople after registration.</p>
+                </div>
+                <div style={{ marginBottom: '10px' }}>
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        required
+                        style={{ width: '100%', padding: '8px' }}
+                    />
+                </div>
+                <div style={{ marginBottom: '10px' }}>
+                    <input
+                        type="password"
+                        name="passwordConfirm"
+                        placeholder="Confirm Password"
+                        value={formData.passwordConfirm}
+                        onChange={handleChange}
+                        required
+                        style={{ width: '100%', padding: '8px' }}
+                    />
+                </div>
+                    <button type="submit" style={{ width: '100%', padding: '10px', backgroundColor: '#007bff', color: 'white', border: 'none', cursor: 'pointer', marginBottom: '10px' }}>
+                    Register
+                </button>
+                <div style={{ textAlign: 'center' }}>
+                    <Link to="/login">Already have an account? Login here</Link>
+                </div>
+            </form>
+        </div>
+    );
+};
+

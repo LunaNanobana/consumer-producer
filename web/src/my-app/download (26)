@@ -1,0 +1,23 @@
+// src/api.js
+
+// REGISTER USER
+export async function registerUser(data) {
+  const res = await fetch('/API/register/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  return res.json();
+}
+
+// GET SUPPLIERS
+export async function getSuppliers() {
+  const res = await fetch('/API/SupplierListView/');
+  return res.json();
+}
+
+// GET CONSUMERS
+export async function getConsumers() {
+  const res = await fetch('/API/ConsumerListView/');
+  return res.json();
+}

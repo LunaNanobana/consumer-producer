@@ -1,0 +1,34 @@
+const PROFILE_IMG = "";
+import "./MyPage.css";
+
+export default function MyManagerPage({ name = "Bruce Wayne", id = "12345" }) {
+  return (
+    <div className="mypage-shell">
+      <div className="mypage-body">
+        <div className="mypage-left">
+          <div className="profile-block">
+            <div className="avatar">
+              <img src={PROFILE_IMG} alt="profile" />
+            </div>
+
+            <div className="profile-meta">
+              <div className="profile-name">{name}</div>
+              <div className="profile-id">ID: {id}</div>
+            </div>
+
+            {}
+            <button
+              className="manage-text-btn"
+              type="button"
+              onClick={() => {}}
+            >
+              Manage
+            </button>
+          </div>
+        </div>
+
+        <div className="mypage-right"></div>
+      </div>
+    </div>
+  );
+}

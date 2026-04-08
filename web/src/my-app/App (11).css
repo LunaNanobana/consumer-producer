@@ -1,0 +1,46 @@
+
+import "./PageLayout.css";
+
+export default function ComplaintModal({ complaint, onClose, onChat, onComplete, onEscalate }) {
+  if (!complaint) return null;
+
+  const TextAction = ({ children, onClick, color }) => (
+    <button
+      className="modal-text-action"
+      onClick={onClick}
+      style={{ color: color || 'inherit' }}
+    >
+      {children}
+    </button>
+  );
+
+  return (
+    <div className="modal-overlay" onMouseDown={onClose}>
+      <div className="modal" onMouseDown={(e) => e.stopPropagation()}>
+        <div className="modal-content">
+          <h3 className="modal-title">Complaint</h3>
+          <p className="modal-body">{complaint.title}</p>
+
+          <div style={{ height: 8 }} />
+
+          <div className="modal-center">
+            <button className="modal-chat-btn" onClick={() => onChat(complaint)}>Chat</button>
+          </div>
+
+          <hr className="modal-sep" />
+
+          <div className="modal-actions-row">
+            <TextAction onClick={() => { onComplete(complaint); onClose(); }} color="#2aa84f">
+              Completed
+            </TextAction>
+            <TextAction onClick={() => { onEscalate(complaint); onClose(); }} color="#e03b3b">
+              Escalate
+            </TextAction>
+          </div>
+        </div>
+
+        <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
+      </div>
+    </div>
+  );
+}
