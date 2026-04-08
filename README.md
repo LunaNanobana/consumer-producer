@@ -66,6 +66,14 @@ consumer-producer/
 ```
 
 ---
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/9a2b36d9-eb6b-4eed-8277-765e11684e77" width="30%">
+  <img src="https://github.com/user-attachments/assets/93cb0d4f-ba81-4798-b4eb-41200f67c86e" width="30%">
+  <img src="https://github.com/user-attachments/assets/5292ca28-5376-4b60-9b07-5171c8abda47" width="30%">
+</p>
+
+
+
 
 ## Run with Docker
 
